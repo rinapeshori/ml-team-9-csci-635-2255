@@ -1,6 +1,6 @@
 # Anticipating Burnout using Work, Screen, and Social Habits
 Group project for Team 9, CSCI 635, Intro to Machine Learning, Spring 2026.
-- Vrutant Chaudary
+- Vrutant Chaudhari
 - Will Hoover
 - Rina Peshori
 
