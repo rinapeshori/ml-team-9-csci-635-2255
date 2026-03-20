@@ -5,9 +5,9 @@ Loading test set...
 
 --- BEGINNING MODEL TRAINING ---
 Training with One vs. Rest, Batch Gradient Descent (BGD)...
-        Converged at iteration 1
-        Converged at iteration 27
-        Converged at iteration 11
+        Converged at iteration 21
+        Reached max. iteration number
+        Reached max. iteration number
 --- MODEL TRAINING COMPLETE ---
 
 --- BEGINNING PREDICTIONS ---
@@ -16,11 +16,11 @@ Predicting with One vs. Rest...
 
 --- BEGINNING EVALUATION ---
 Computing accuracy...
-Accuracy: 0.9275
+Accuracy: 0.9425
 Constructing the confusion matrix...
-[[203   1   0]
- [ 12 148   9]
- [  0   7  20]]
+[[195   9   0]
+ [  6 156   7]
+ [  0   1  26]]
 --- EVALUATION COMPLETE ---
 
 Exiting... Thank you!

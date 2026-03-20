@@ -10,7 +10,7 @@ import pandas
 NUM_TARGET_CLASSES = 3
 
 # Define base file path for data retrieval
-BASE_PATH = "processed_data/"
+BASE_PATH = "data/processed_data/"
 
 # Define hyperparameters for model training
 ITERATIONS = 5000 # define max. number of times we can iterate during alg. training
@@ -37,6 +37,7 @@ def get_test_data():
 def _get_data_from_csv(X_path, y_path):
     # fetch a dataset from given csv filepaths
     if not os.path.isfile(X_path) or not os.path.isfile(y_path):
+        # TODO: Ensure that program execution halts if error is encountered here.
         print(f"Error: File not found.")
         return None, None
     try :
@@ -74,7 +75,7 @@ def compute_loss(y, p):
     epsilon = 1e-15
     p = np.clip(p, epsilon, 1-epsilon)
     result = np.mean(y * np.log(p) + (1-y) * np.log(1-p)) # I love numpy
-    result = (-1/len(y)) * result
+    # result = (-1/len(y)) * result
     return result
 
 def train_oneVrest(X, y, num_classes):
@@ -132,6 +133,9 @@ def train_bgd(X, y): # Batch Gradient Descent
         # UPDATE beta accordingly!
         # using our assigned learning rate
         Beta_matrix = Beta_matrix - ETA * gradient
+
+        if i == ITERATIONS-1:
+            print("\tReached max. iteration number")
 
     return Beta_matrix
 
