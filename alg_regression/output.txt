@@ -1,0 +1,26 @@
+--- LOADING DATASETS ---
+Loading training set...
+Loading test set...
+--- LOADING DATASETS COMPLETE ---
+
+--- BEGINNING MODEL TRAINING ---
+Training with One vs. Rest, Batch Gradient Descent (BGD)...
+        Converged at iteration 21
+        Reached max. iteration number
+        Reached max. iteration number
+--- MODEL TRAINING COMPLETE ---
+
+--- BEGINNING PREDICTIONS ---
+Predicting with One vs. Rest...
+--- PREDICTIONS COMPLETE ---
+
+--- BEGINNING EVALUATION ---
+Computing accuracy...
+Accuracy: 0.9425
+Constructing the confusion matrix...
+[[195   9   0]
+ [  6 156   7]
+ [  0   1  26]]
+--- EVALUATION COMPLETE ---
+
+Exiting... Thank you!
