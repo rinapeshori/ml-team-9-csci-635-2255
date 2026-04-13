@@ -2,6 +2,14 @@ import pandas as pd
 import numpy as np
 from TreeNode import TreeNode, DecideLow, DecideMedium, DecideHigh
 
+# Hyperparameters
+NUM_TREES = 20 # Number of trees in the forest
+
+# Early stopping criteria
+MAX_DEPTH = 5 # Max depth of the decision trees
+MIN_SPLITTING_SIZE = 23 # Sample count below which the tree should decide for the plurality class
+DECISION_THRESHOLD = 0.85 # If a tree node has above this percentage of samples in one class, the tree decides for that class
+
 def load_train_data():
     x_train = pd.read_csv('data/processed_data/X_train_scaled.csv')
     y_train = pd.read_csv('data/processed_data/y_train.csv')
@@ -61,12 +69,12 @@ def construct_node(data: pd.DataFrame, target: np.ndarray, features, parent_leve
         1: DecideMedium(parent_level+1),
         2: DecideHigh(parent_level+1)
     }
-    if (parent_level == 5 or len(data) < 23):
+    if (parent_level == MAX_DEPTH or len(data) < MIN_SPLITTING_SIZE):
         if len(data) == 0:
             return DecideLow(parent_level+1)
         return decisions[np.argmax(np.bincount(target))]
     for i in range(3):
-        if len(target[target == i]) / len(target) > 0.85:
+        if len(target[target == i]) / len(target) > DECISION_THRESHOLD:
             return decisions[i] 
         
     # Decide which attribute is the best to split on and at which threshold
@@ -104,7 +112,7 @@ def main():
 
     # Make the random forest
     trees = []
-    for _ in range(20):
+    for _ in range(NUM_TREES):
         xb, yb = bootstrap_sample(x_train, y_train)
         trees.append(construct_node(xb, yb["burnout_risk"], features, 0))
 
