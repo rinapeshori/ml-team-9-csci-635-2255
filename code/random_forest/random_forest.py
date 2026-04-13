@@ -6,8 +6,8 @@ from TreeNode import TreeNode, DecideLow, DecideMedium, DecideHigh
 NUM_TREES = 20 # Number of trees in the forest
 
 # Early stopping criteria
-MAX_DEPTH = 5 # Max depth of the decision trees
-MIN_SPLITTING_SIZE = 23 # Sample count below which the tree should decide for the plurality class
+MAX_DEPTH = 7 # Max depth of the decision trees
+MIN_SPLITTING_SIZE = 15 # Sample count below which the tree should decide for the plurality class
 DECISION_THRESHOLD = 0.85 # If a tree node has above this percentage of samples in one class, the tree decides for that class
 
 def load_train_data():
@@ -55,7 +55,7 @@ def best_avg_entropy(data: pd.DataFrame, target: np.ndarray, feature_name: str):
     np_entropies = np.array(avg_entropies)
     return np.min(np_entropies), thresh_range[np.argmin(np_entropies)]
         
-def construct_node(data: pd.DataFrame, target: np.ndarray, features, parent_level: int):
+def construct_node(data: pd.DataFrame, target: np.ndarray, features, parent_level: int, max_depth: int = MAX_DEPTH, min_size: int = MIN_SPLITTING_SIZE, decision_thresh: float = DECISION_THRESHOLD):
     """
     Recursively construct a decision tree using a custom node structure.
     """
@@ -69,12 +69,12 @@ def construct_node(data: pd.DataFrame, target: np.ndarray, features, parent_leve
         1: DecideMedium(parent_level+1),
         2: DecideHigh(parent_level+1)
     }
-    if (parent_level == MAX_DEPTH or len(data) < MIN_SPLITTING_SIZE):
+    if (parent_level == max_depth or len(data) < min_size):
         if len(data) == 0:
             return DecideLow(parent_level+1)
         return decisions[np.argmax(np.bincount(target))]
     for i in range(3):
-        if len(target[target == i]) / len(target) > DECISION_THRESHOLD:
+        if len(target[target == i]) / len(target) > decision_thresh:
             return decisions[i] 
         
     # Decide which attribute is the best to split on and at which threshold
@@ -92,8 +92,8 @@ def construct_node(data: pd.DataFrame, target: np.ndarray, features, parent_leve
     # function to construct more nodes for splitting the data on each side of 
     # the current threshold.
     this_node = TreeNode(best_att, best_thresh, parent_level+1)
-    this_node.under = construct_node(data[data[best_att] <= best_thresh], target[data[best_att] <= best_thresh], features, parent_level+1)
-    this_node.over = construct_node(data[data[best_att] > best_thresh], target[data[best_att] > best_thresh], features, parent_level+1)
+    this_node.under = construct_node(data[data[best_att] <= best_thresh], target[data[best_att] <= best_thresh], features, parent_level+1, max_depth, min_size, decision_thresh)
+    this_node.over = construct_node(data[data[best_att] > best_thresh], target[data[best_att] > best_thresh], features, parent_level+1, max_depth, min_size, decision_thresh)
     return this_node
 
 def classify(forest: list[TreeNode], x: pd.DataFrame):
