@@ -10,13 +10,16 @@ MAX_DEPTH = 7 # Max depth of the decision trees
 MIN_SPLITTING_SIZE = 15 # Sample count below which the tree should decide for the plurality class
 DECISION_THRESHOLD = 0.85 # If a tree node has above this percentage of samples in one class, the tree decides for that class
 
-def load_train_data():
-    x_train = pd.read_csv('data/processed_data/X_train_scaled.csv')
-    y_train = pd.read_csv('data/processed_data/y_train.csv')
+def load_data(type: str):
+    x_train = pd.read_csv(f'data/processed_data/X_{type}_scaled.csv')
+    y_train = pd.read_csv(f'data/processed_data/y_{type}.csv')
     features = x_train.columns
     return x_train, y_train, features
 
 def bootstrap_sample(x, y):
+    """
+    Construct a bootstrap sample with replacement from the x/y dataset
+    """
     n_samples = x.shape[0]
     indices = np.random.choice(n_samples, size=n_samples, replace=True)
     return x.iloc[indices], y.iloc[indices]
@@ -97,6 +100,9 @@ def construct_node(data: pd.DataFrame, target: np.ndarray, features, parent_leve
     return this_node
 
 def classify(forest: list[TreeNode], x: pd.DataFrame):
+    """
+    Use the random forest to make a plurality/majority decision on each input sample.
+    """
     y = []
     for sample in x.iterrows():
         bins = [0, 0, 0]
@@ -106,9 +112,15 @@ def classify(forest: list[TreeNode], x: pd.DataFrame):
         
     return np.array(y)
 
+def test_for_fine_tuning():
+    """
+    Test a set of hyperparameters to find which ones find the ideal bias-variance tradeoff between validation and training data
+    """
+    
+
 def main():
     # Load the training data
-    x_train, y_train, features = load_train_data()
+    x_train, y_train, features = load_data("train")
 
     # Make the random forest
     trees = []
@@ -116,9 +128,14 @@ def main():
         xb, yb = bootstrap_sample(x_train, y_train)
         trees.append(construct_node(xb, yb["burnout_risk"], features, 0))
 
-    # Run!
+    # Run on training data
     y_train_pred = classify(trees, x_train)
-    print(len(y_train_pred[y_train_pred == y_train["burnout_risk"]]) / len(y_train))
+    print(f"Training accuracy: {len(y_train_pred[y_train_pred == y_train["burnout_risk"]]) / len(y_train)}")
+
+    # Run on test data
+    x_test, y_test, _ = load_data("test")
+    y_test_pred = classify(trees, x_test)
+    print(f"Test accuracy: {len(y_test_pred[y_test_pred == y_test["burnout_risk"]]) / len(y_test)}")
 
 if __name__ == "__main__":
     main()
