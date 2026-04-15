@@ -95,5 +95,10 @@ def main():
 
     logistic_regression.run_algorithm(df_X_synth, df_y_synth)
 
+    ## TODO:
+    # - convert to unscaled data generation (or give it as an option)
+    # - export as csv (can be separate from original dataset)
+    # - make sure there's a function that JUST produces that unscaled csv file for pipeline integration
+
 if __name__ == "__main__":
     main()
