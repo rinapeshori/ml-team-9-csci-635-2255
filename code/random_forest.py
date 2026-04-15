@@ -1,9 +1,11 @@
 import pandas as pd
 import numpy as np
 from TreeNode import TreeNode, DecideLow, DecideMedium, DecideHigh
+from data_splits import train_test, kfold_crossval
+from sklearn.preprocessing import StandardScaler
 
 # Hyperparameters
-NUM_TREES = 20 # Number of trees in the forest
+NUM_TREES = 10 # Number of trees in the forest
 
 # Early stopping criteria
 MAX_DEPTH = 7 # Max depth of the decision trees
@@ -22,7 +24,7 @@ def bootstrap_sample(x, y):
     """
     n_samples = x.shape[0]
     indices = np.random.choice(n_samples, size=n_samples, replace=True)
-    return x.iloc[indices], y.iloc[indices]
+    return x.iloc[indices].reset_index(), y.iloc[indices].reset_index()["burnout_risk"]
 
 def log2(x: float):
     """
@@ -48,7 +50,6 @@ def best_avg_entropy(data: pd.DataFrame, target: np.ndarray, feature_name: str):
     Finds the minimum average entropy in the data when splitting on the given feature and returns that value and the threshold at which it occurs.
     """
     feature = np.array(data[feature_name])
-    
     avg_entropies = []
     thresh_range = np.linspace(np.min(feature), np.max(feature), num=50)
     for thresh in thresh_range:
@@ -95,8 +96,10 @@ def construct_node(data: pd.DataFrame, target: np.ndarray, features, parent_leve
     # function to construct more nodes for splitting the data on each side of 
     # the current threshold.
     this_node = TreeNode(best_att, best_thresh, parent_level+1)
-    this_node.under = construct_node(data[data[best_att] <= best_thresh], target[data[best_att] <= best_thresh], features, parent_level+1, max_depth, min_size, decision_thresh)
-    this_node.over = construct_node(data[data[best_att] > best_thresh], target[data[best_att] > best_thresh], features, parent_level+1, max_depth, min_size, decision_thresh)
+    under = data[best_att] <= best_thresh
+    over = data[best_att] > best_thresh
+    this_node.under = construct_node(data[under], target[under], features, parent_level+1, max_depth, min_size, decision_thresh)
+    this_node.over = construct_node(data[over] > best_thresh, target[over], features, parent_level+1, max_depth, min_size, decision_thresh)
     return this_node
 
 def classify(forest: list[TreeNode], x: pd.DataFrame):
@@ -116,26 +119,44 @@ def test_for_fine_tuning():
     """
     Test a set of hyperparameters to find which ones find the ideal bias-variance tradeoff between validation and training data
     """
-    
+
+def train(x: pd.DataFrame, y: pd.DataFrame):
+    """
+    Trains a decision tree model on the x and y training sets and returns a method to classify future sets of samples
+    """
+    features = x.columns
+    trees = []
+    for _ in range(NUM_TREES):
+        xb, yb = bootstrap_sample(x, y)
+        trees.append(construct_node(xb, yb, features, 0))
+
+    return lambda x: classify(trees, x)
 
 def main():
     # Load the training data
-    x_train, y_train, features = load_data("train")
+    x_train, x_test, y_train, y_test = train_test()
+    features = x_train.columns
+    
+    # Run k-fold cross validation on the model
+    t_acc, v_acc = kfold_crossval(x_train, y_train, train)
+    print(f"Training accuracy: {t_acc}")
+    print(f"Validation accuracy: {v_acc}")
 
-    # Make the random forest
+    # Make the random forest on all training data
+    sc = StandardScaler()
+    x_train = pd.DataFrame(sc.fit_transform(x_train), columns=x_train.columns)
+    x_test = pd.DataFrame(sc.transform(x_test), columns=x_test.columns)
     trees = []
     for _ in range(NUM_TREES):
         xb, yb = bootstrap_sample(x_train, y_train)
-        trees.append(construct_node(xb, yb["burnout_risk"], features, 0))
+        trees.append(construct_node(xb, yb, features, 0))
 
-    # Run on training data
     y_train_pred = classify(trees, x_train)
-    print(f"Training accuracy: {len(y_train_pred[y_train_pred == y_train["burnout_risk"]]) / len(y_train)}")
+    print(f"Training accuracy: {len(y_train_pred[y_train_pred == y_train]) / len(y_train)}")
 
     # Run on test data
-    x_test, y_test, _ = load_data("test")
     y_test_pred = classify(trees, x_test)
-    print(f"Test accuracy: {len(y_test_pred[y_test_pred == y_test["burnout_risk"]]) / len(y_test)}")
+    print(f"Test accuracy: {len(y_test_pred[y_test_pred == y_test]) / len(y_test)}")
 
 if __name__ == "__main__":
     main()
