@@ -1,5 +1,6 @@
 """
 Logistic Regression Model
+Rina Peshori
 """
 
 import numpy as np
@@ -164,12 +165,19 @@ def compute_confusion_matrix(y_true, y_pred, num_classes):
         cm[true][predicted] += 1 # increment count for appropriate value based on true vs. predicted value
     return cm
 
-def main():
+# Run the custom-implemented Logistic Regression algorithm
+# Supports custom test_X and y input (will not perform evaluation on custom inputs)
+def run_algorithm(test_X=pandas.DataFrame(), test_y=pandas.DataFrame()):
+    custom_test_X = not test_X.empty # if given X is empty, no custom input was provided
+
     print("--- LOADING DATASETS ---")
     print("Loading training set...")
     train_X, train_y = get_train_data()
-    print("Loading test set...")
-    test_X, test_y = get_test_data()
+    if not custom_test_X:
+        print("Loading test set...")
+        test_X, test_y = get_test_data()
+    else:
+        print("Custom X and y sets provided. Proceeding with custom test set...")
     print("--- LOADING DATASETS COMPLETE ---")
     print()
 
@@ -197,6 +205,8 @@ def main():
     print("--- EVALUATION COMPLETE ---")
     print()
 
+def main():
+    run_algorithm()
     print("Exiting... Thank you!")
     
 
