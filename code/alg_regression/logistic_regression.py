@@ -205,10 +205,15 @@ def run_algorithm(test_X=pandas.DataFrame(), test_y=pandas.DataFrame()):
     print("--- EVALUATION COMPLETE ---")
     print()
 
+def training_pipeline(train_X, train_y):
+    # returns the classification function
+    # NOTE: also returns the calculated model modifiers, which should be passed as a param to the classification function
+    model_Betas = train_oneVrest(train_X, train_y, NUM_TARGET_CLASSES)
+    return make_decisions, model_Betas
+
 def main():
     run_algorithm()
     print("Exiting... Thank you!")
-    
 
 if __name__ == "__main__":
     main()
