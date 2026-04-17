@@ -19,11 +19,12 @@ def run_kfold():
     """
     print("-------RANDOM FOREST---------")
     tacc, vacc = kfold_crossval(X_train, y_train, rf.train)
-    print()
+    print(f"Training accuracy: {tacc}")
+    print(f"Validation accuracy: {vacc}")
     
 
 def run_train_test():
-    pass
+    print("Not implemented yet")
 
 def main(kfold: bool):
     if kfold:
@@ -35,11 +36,11 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--kfold",
-        type=bool,
-        default=True,
+        action="store_const",
+        const=True,
+        default=False,
         required=False,
-        help="Path to the scene folder which must at least contain view1.png, view5.png, and "
-        "disp1.png.",
+        help="Whether or not to run k-fold validation",
     )
     args = parser.parse_args()
     main(args.kfold)

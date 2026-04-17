@@ -1,6 +1,6 @@
 import pandas as pd
 import numpy as np
-from TreeNode import TreeNode, DecideLow, DecideMedium, DecideHigh
+from random_forest.TreeNode import TreeNode, DecideLow, DecideMedium, DecideHigh
 from sklearn.preprocessing import StandardScaler
 
 # Hyperparameters
