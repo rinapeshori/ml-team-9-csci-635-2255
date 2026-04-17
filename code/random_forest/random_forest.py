@@ -1,7 +1,6 @@
 import pandas as pd
 import numpy as np
 from TreeNode import TreeNode, DecideLow, DecideMedium, DecideHigh
-from data_splits import train_test, kfold_crossval
 from sklearn.preprocessing import StandardScaler
 
 # Hyperparameters
@@ -134,29 +133,30 @@ def train(x: pd.DataFrame, y: pd.DataFrame):
 
 def main():
     # Load the training data
-    x_train, x_test, y_train, y_test = train_test()
-    features = x_train.columns
+    # x_train, x_test, y_train, y_test = train_test()
+    # features = x_train.columns
     
-    # Run k-fold cross validation on the model
-    t_acc, v_acc = kfold_crossval(x_train, y_train, train)
-    print(f"Training accuracy: {t_acc}")
-    print(f"Validation accuracy: {v_acc}")
+    # # Run k-fold cross validation on the model
+    # t_acc, v_acc = kfold_crossval(x_train, y_train, train)
+    # print(f"Training accuracy: {t_acc}")
+    # print(f"Validation accuracy: {v_acc}")
 
-    # Make the random forest on all training data
-    sc = StandardScaler()
-    x_train = pd.DataFrame(sc.fit_transform(x_train), columns=x_train.columns)
-    x_test = pd.DataFrame(sc.transform(x_test), columns=x_test.columns)
-    trees = []
-    for _ in range(NUM_TREES):
-        xb, yb = bootstrap_sample(x_train, y_train)
-        trees.append(construct_node(xb, yb, features, 0))
+    # # Make the random forest on all training data
+    # sc = StandardScaler()
+    # x_train = pd.DataFrame(sc.fit_transform(x_train), columns=x_train.columns)
+    # x_test = pd.DataFrame(sc.transform(x_test), columns=x_test.columns)
+    # trees = []
+    # for _ in range(NUM_TREES):
+    #     xb, yb = bootstrap_sample(x_train, y_train)
+    #     trees.append(construct_node(xb, yb, features, 0))
 
-    y_train_pred = classify(trees, x_train)
-    print(f"Training accuracy: {len(y_train_pred[y_train_pred == y_train]) / len(y_train)}")
+    # y_train_pred = classify(trees, x_train)
+    # print(f"Training accuracy: {len(y_train_pred[y_train_pred == y_train]) / len(y_train)}")
 
-    # Run on test data
-    y_test_pred = classify(trees, x_test)
-    print(f"Test accuracy: {len(y_test_pred[y_test_pred == y_test]) / len(y_test)}")
+    # # Run on test data
+    # y_test_pred = classify(trees, x_test)
+    # print(f"Test accuracy: {len(y_test_pred[y_test_pred == y_test]) / len(y_test)}")
+    pass
 
 if __name__ == "__main__":
     main()

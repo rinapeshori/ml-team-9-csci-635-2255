@@ -4,7 +4,7 @@ from sklearn.model_selection import train_test_split
 
 DATA_FILE = "data/wfh_burnout_dataset.csv"
 
-def train_test(split = 20, k: int = None):
+def train_test(split: float = 0.2):
     """
     Obtain a train/test split from our dataset.
     """
@@ -14,7 +14,7 @@ def train_test(split = 20, k: int = None):
     X_train, X_test, y_train, y_test = train_test_split(
         X,
         y,
-        test_size=0.2,
+        test_size=split,
         stratify=y,
         random_state=42
     )
