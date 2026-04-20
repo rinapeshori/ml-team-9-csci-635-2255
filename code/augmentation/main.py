@@ -14,24 +14,53 @@ import pandas
 # Needed for generating data from an existing dataset
 from sklearn.neighbors import KernelDensity
 from sklearn.model_selection import GridSearchCV
+from sklearn.preprocessing import StandardScaler
 
 # Define the seed so that results can be reproduced
 seed = 11
 rand_state = 11
 
 # Define base file path for data retrieval
-BASE_PATH = "data/processed_data/"
+BASE_PATH = "data/"
+SCALED_BASE_PATH = "data/processed_data/"
 
 def get_train_data():
-    # fetch training dataset from csv
-    X_path = BASE_PATH + "X_train_scaled.csv"
-    y_path = BASE_PATH + "y_train.csv"
-    return _get_data_from_csv(X_path, y_path)
-    
-def _get_data_from_csv(X_path, y_path):
+    # fetch UNSCALED training dataset from csv
+    path = BASE_PATH + "wfh_burnout_dataset.csv"
+    if os.path.exists(path):
+        try:
+            ds = pandas.read_csv(path, low_memory=False)
+            # drop unnecessary feature
+            ds = ds.drop("user_id", axis=1)
+            # drop unnecessary target
+            ds = ds.drop("burnout_score", axis=1)
+            # encode string column(s)
+            ds["day_type"] = ds["day_type"].map({"Weekend": 1, "Weekday": 0})
+            # ds = pandas.get_dummies(ds, columns=["day_type"], drop_first=True)
+            # encode target variable
+            ds["burnout_risk"] = ds["burnout_risk"].map({"High": 2, "Medium": 1, "Low": 0})
+            # separate features from targets
+            X = ds.drop("burnout_risk", axis=1)
+            y = ds["burnout_risk"]
+            return X, y
+        except pandas.errors.EmptyDataError:
+            print("Error: CSV file is empty.")
+        except pandas.errors.ParserError as e:
+            print(f"Error: Failed to parse CSV - {e}")
+        except Exception as e:
+            print(f"Unexpected Error: {e}")
+        return None, None
+    else:
+        print(f"Error: File not found.")
+        return None, None
+
+def get_scaled_train_data():
+    # fetch scaled training dataset from csv
+    X_path = SCALED_BASE_PATH + "X_train_scaled.csv"
+    y_path = SCALED_BASE_PATH + "y_train.csv"
     # fetch a dataset from given csv filepaths
     if not os.path.isfile(X_path) or not os.path.isfile(y_path):
-        # TODO: Ensure that program execution halts if error is encountered here.
+        # Ensure that program execution halts if error is encountered here.
         print(f"Error: File not found.")
         return None, None
     try :
@@ -46,10 +75,66 @@ def _get_data_from_csv(X_path, y_path):
         print(f"Unexpected Error: {e}")
     return None, None
 
-def main():
-    n_samples = 2000 # number of samples to generate
+def _scale_data(X):
+    train_X_raw, _ = get_train_data()
+    scaler = StandardScaler().fit(train_X_raw)
+    X_scaled = scaler.transform(X)
+    X_scaled = pandas.DataFrame(X_scaled, columns=X.columns)
+    return X_scaled
 
-    X, y = get_train_data()
+def _apply_constraints(df, constraints):
+    """
+    constraints: dict mapping column name -> spec
+    spec examples:
+        {"type": "categorical", "values": [0, 1]}
+        {"type": "int", "min": 0, "max": 20}
+    """
+    if not constraints:
+        return df
+    df = df.copy()
+    for col, spec in constraints.items():
+        if col not in df.columns:
+            continue
+        # operate on numeric representation
+        vals = df[col].astype(float).to_numpy()
+        t = spec.get("type")
+        if t == "categorical":
+            allowed = np.array(spec.get("values", []))
+            if allowed.size == 0:
+                continue
+            idx = np.abs(vals[:, None] - allowed[None, :]).argmin(axis=1)
+            df[col] = allowed[idx]
+        elif t == "int":
+            mn = spec.get("min", None)
+            mx = spec.get("max", None)
+            ints = np.rint(vals).astype(int)
+            if mn is not None or mx is not None:
+                if mn is None:
+                    mn = ints.min()
+                if mx is None:
+                    mx = ints.max()
+                ints = np.clip(ints, mn, mx)
+            df[col] = ints
+        elif t == "float":
+            mn = spec.get("min", None)
+            mx = spec.get("max", None)
+            fvals = vals
+            if mn is not None or mx is not None:
+                if mn is None:
+                    mn = fvals.min()
+                if mx is None:
+                    mx = fvals.max()
+                fvals = np.clip(fvals, mn, mx)
+            df[col] = fvals
+        else:
+            mn = spec.get("min", None)
+            mx = spec.get("max", None)
+            if mn is not None or mx is not None:
+                df[col] = np.clip(vals, mn if mn is not None else vals.min(), mx if mx is not None else vals.max())
+    return df
+
+def _data_gen(X, y, n_samples, constraints=None):
+    # generates synthetic X and y datasets given original X and y and number of samples to generate
     kdes = {} # fit a different kde model for each class
 
     # ensure y is 1-D
@@ -88,12 +173,54 @@ def main():
     df_X_synth = pandas.DataFrame(X_synthset, columns=X.columns)
     df_y_synth = pandas.Series(y_synthset)
 
-    print(df_X_synth)
-    print()
-    print()
-    print(df_y_synth)
+    # Apply constraints (if provided) to enforce categorical/int/float ranges
+    df_X_synth = _apply_constraints(df_X_synth, constraints)
 
-    logistic_regression.run_algorithm(df_X_synth, df_y_synth)
+    return df_X_synth, df_y_synth
+
+def generate_unscaled_synthetic_data(n_samples=2000):
+    X, y = get_train_data()
+    print(X)
+    print(y)
+    # provide constraints to the generated unscaled data (based on original dataset constraints)
+    # float constraints shouldn't be necessary, but are included here just in case
+    constraints = {
+        "day_type": {"type": "categorical", "values": [0, 1]},
+        "work_hours": {"type": "float", "min": 0.5, "max": 18},
+        "screen_time_hours": {"type": "float", "min": 0, "max": 18},
+        "meetings_count": {"type": "int", "min": 0, "max": 20},
+        "breaks_taken": {"type": "int", "min": 0, "max": 15},
+        "after_hours_work": {"type": "categorical", "values": [0, 1]},
+        "app_switches": {"type": "int", "min": 5, "max": 200},
+        "sleep_hours": {"type": "float", "min": 3, "max": 10},
+        "task_completion": {"type": "float", "min": 0, "max": 100},
+        "isolation_index": {"type": "int", "min": 3, "max": 9},
+        "fatigue_score": {"type": "float", "min": 0, "max": 10},
+    }
+
+    newX, newY = _data_gen(X, y, n_samples, constraints=constraints)
+
+    print(newX)
+    print()
+    print()
+    print(newY)
+
+    return newX, newY
+
+def main():
+    newX, newY = generate_unscaled_synthetic_data()
+    newX_scaled = _scale_data(newX)
+    # n_samples = 2000 # number of samples to generate
+
+    # X, y = get_scaled_train_data()
+    # newX, newY = _data_gen(X, y, n_samples)
+
+    # print(newX)
+    # print()
+    # print()
+    # print(newY)
+
+    logistic_regression.run_algorithm_custom_train(newX_scaled, newY)
 
     ## TODO:
     # - convert to unscaled data generation (or give it as an option)

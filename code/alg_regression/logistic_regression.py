@@ -38,7 +38,7 @@ def get_test_data():
 def _get_data_from_csv(X_path, y_path):
     # fetch a dataset from given csv filepaths
     if not os.path.isfile(X_path) or not os.path.isfile(y_path):
-        # TODO: Ensure that program execution halts if error is encountered here.
+        # Ensure that program execution halts if error is encountered here.
         print(f"Error: File not found.")
         return None, None
     try :
@@ -166,8 +166,8 @@ def compute_confusion_matrix(y_true, y_pred, num_classes):
     return cm
 
 # Run the custom-implemented Logistic Regression algorithm
-# Supports custom test_X and y input (will not perform evaluation on custom inputs)
-def run_algorithm(test_X=pandas.DataFrame(), test_y=pandas.DataFrame()):
+# Supports custom test_X and y input
+def run_algorithm_custom_test(test_X=pandas.DataFrame(), test_y=pandas.DataFrame()):
     custom_test_X = not test_X.empty # if given X is empty, no custom input was provided
 
     print("--- LOADING DATASETS ---")
@@ -205,6 +205,46 @@ def run_algorithm(test_X=pandas.DataFrame(), test_y=pandas.DataFrame()):
     print("--- EVALUATION COMPLETE ---")
     print()
 
+# Run the custom-implemented Logistic Regression algorithm
+# Supports custom train_X and y input (will not perform evaluation on custom inputs)
+def run_algorithm_custom_train(train_X=pandas.DataFrame(), train_y=pandas.DataFrame()):
+    custom_train_X = not train_X.empty # if given X is empty, no custom input was provided
+
+    print("--- LOADING DATASETS ---")
+    if not custom_train_X:
+        print("Loading training set...")
+        train_X, train_y = get_train_data()
+    else:
+        print("Custom X and y sets provided. Proceeding with custom train set...")
+    print("Loading test set...")
+    test_X, test_y = get_test_data()
+    print("--- LOADING DATASETS COMPLETE ---")
+    print()
+
+    print("--- BEGINNING MODEL TRAINING ---")
+    print("Training with One vs. Rest, Batch Gradient Descent (BGD)...")
+    model_Betas = train_oneVrest(train_X, train_y, NUM_TARGET_CLASSES)
+    print("--- MODEL TRAINING COMPLETE ---")
+    print()
+
+    print("--- BEGINNING PREDICTIONS ---")
+    print("Predicting with One vs. Rest...")
+    y_pred = make_decisions(test_X, model_Betas)
+    print("--- PREDICTIONS COMPLETE ---")
+    print()
+
+    print("--- BEGINNING EVALUATION ---")
+    # ensure test_y is a 1-D vector for arithmetic
+    test_y_matrix = test_y.values.reshape(-1) # -1 automatically reshapes into 1-D
+    print("Computing accuracy...")
+    accuracy = compute_accuracy(test_y_matrix, y_pred)
+    print(f"Accuracy: {accuracy:.4f}")
+    print("Constructing the confusion matrix...")
+    cm = compute_confusion_matrix(test_y_matrix, y_pred, NUM_TARGET_CLASSES)
+    print(cm)
+    print("--- EVALUATION COMPLETE ---")
+    print()
+
 def training_pipeline(train_X, train_y):
     # returns the classification function
     # NOTE: also returns the calculated model modifiers, which should be passed as a param to the classification function
@@ -212,7 +252,7 @@ def training_pipeline(train_X, train_y):
     return make_decisions, model_Betas
 
 def main():
-    run_algorithm()
+    run_algorithm_custom_test()
     print("Exiting... Thank you!")
 
 if __name__ == "__main__":
