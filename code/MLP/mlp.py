@@ -245,7 +245,7 @@ def train(X_train, y_train):
     global NUM_TARGET_CLASSES
     if isinstance(y_train, pd.DataFrame):
         y_train = y_train.iloc[:, 0]
-    NUM_TARGET_CLASSES = len(np.unique(np.array(y_train).ravel()))
+    NUM_TARGET_CLASSES = len(np.unique(y_train))
     X_train_split, X_val, y_train_split, y_val = train_test_split(
         X_train,
         y_train,
