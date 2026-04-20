@@ -281,12 +281,10 @@ def train(X_train, y_train):
         f"best val acc: {best_val_acc:.4f} | "
         f"best val loss: {best_val_loss:.4f}"
     )
-    def fitfunc(X):
-        if isinstance(X, pd.DataFrame):
-            X_tensor = torch.tensor(X.values, dtype=torch.float32)
-        else:
-            X_tensor = torch.tensor(np.asarray(X), dtype=torch.float32)
-
-        preds, _ = predict_model(best_model, X_tensor)
-        return preds
-    return fitfunc
+    return lambda X: predict_model(
+        best_model,
+        torch.tensor(
+            X.values if isinstance(X, pd.DataFrame) else np.asarray(X),
+            dtype=torch.float32
+        )
+    )[0]
