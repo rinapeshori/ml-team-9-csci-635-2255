@@ -251,6 +251,14 @@ def training_pipeline(train_X, train_y):
     model_Betas = train_oneVrest(train_X, train_y, NUM_TARGET_CLASSES)
     return make_decisions, model_Betas
 
+def train(X, y):
+    if isinstance(y, pandas.DataFrame):
+        y = y.iloc[:, 0]
+    global NUM_TARGET_CLASSES
+    NUM_TARGET_CLASSES = len(np.unique(y))
+    decisions, betas = training_pipeline(X, y)
+    return lambda X_new: decisions(X_new, betas)
+
 def main():
     run_algorithm_custom_test()
     print("Exiting... Thank you!")
