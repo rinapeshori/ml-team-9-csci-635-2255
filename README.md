@@ -11,7 +11,7 @@ In this project, we develop and fine-tune three models that classify a person's 
 ## Execution instructions
 
 Before running any code, ensure you have python downloaded on your machine. In the root directory of the project, start by installing all of the dependencies in the requirements:
-`pip install -r requirements.txt`
+`pip install -r code/requirements.txt`
 
 To run the 3-model pipeline, simply run `python main.py` in the root directory. This will run all 3 models on a train-test split and output the accuracy and confusion matrix results.
 
