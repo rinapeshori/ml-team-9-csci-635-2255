@@ -5,7 +5,7 @@ Rina Peshori
 IMPORTANT -- RUN WITH COMMAND SIMILAR TO BELOW
 'py -m code.augmentation.main'
 """
-from ..alg_regression import logistic_regression
+# from ..alg_regression import logistic_regression
 
 import numpy as np
 import os
@@ -35,7 +35,7 @@ def get_train_data():
             # drop unnecessary target
             ds = ds.drop("burnout_score", axis=1)
             # encode string column(s)
-            ds["day_type"] = ds["day_type"].map({"Weekend": 1, "Weekday": 0})
+            ds = pandas.get_dummies(ds, columns=["day_type"], drop_first=True) # CHANGE:
             # ds = pandas.get_dummies(ds, columns=["day_type"], drop_first=True)
             # encode target variable
             ds["burnout_risk"] = ds["burnout_risk"].map({"High": 2, "Medium": 1, "Low": 0})
@@ -185,7 +185,7 @@ def generate_unscaled_synthetic_data(n_samples=2000):
     # provide constraints to the generated unscaled data (based on original dataset constraints)
     # float constraints shouldn't be necessary, but are included here just in case
     constraints = {
-        "day_type": {"type": "categorical", "values": [0, 1]},
+        "day_type_Weekend": {"type": "categorical", "values": [0, 1]}, # CHANGE:
         "work_hours": {"type": "float", "min": 0.5, "max": 18},
         "screen_time_hours": {"type": "float", "min": 0, "max": 18},
         "meetings_count": {"type": "int", "min": 0, "max": 20},
@@ -207,6 +207,46 @@ def generate_unscaled_synthetic_data(n_samples=2000):
 
     return newX, newY
 
+def augment_training_data(X, y, n_samples=2000):
+    if isinstance(y, pandas.DataFrame):
+        y = y.squeeze()
+    else:
+        y = y.squeeze() if hasattr(y, "squeeze") else y
+
+    df_X_synth, df_y_synth = _data_gen(X, y, n_samples)
+
+    X_aug = pandas.concat([X, df_X_synth], ignore_index=True)
+    y_aug = pandas.concat([y, df_y_synth], ignore_index=True)
+
+    return X_aug, y_aug
+
+def augment_training_data_unscaled(X, y, n_samples=2000):
+    if isinstance(y, pandas.DataFrame):
+        y = y.squeeze()
+    else:
+        y = y.squeeze() if hasattr(y, "squeeze") else y
+
+    constraints = {
+        "day_type_Weekend": {"type": "categorical", "values": [0, 1]},
+        "work_hours": {"type": "float", "min": 0.5, "max": 18},
+        "screen_time_hours": {"type": "float", "min": 0, "max": 18},
+        "meetings_count": {"type": "int", "min": 0, "max": 20},
+        "breaks_taken": {"type": "int", "min": 0, "max": 15},
+        "after_hours_work": {"type": "categorical", "values": [0, 1]},
+        "app_switches": {"type": "int", "min": 5, "max": 200},
+        "sleep_hours": {"type": "float", "min": 3, "max": 10},
+        "task_completion": {"type": "float", "min": 0, "max": 100},
+        "isolation_index": {"type": "int", "min": 3, "max": 9},
+        "fatigue_score": {"type": "float", "min": 0, "max": 10},
+    }
+
+    df_X_synth, df_y_synth = _data_gen(X, y, n_samples, constraints=constraints)
+
+    X_aug = pandas.concat([X, df_X_synth], ignore_index=True)
+    y_aug = pandas.concat([y, df_y_synth], ignore_index=True)
+
+    return X_aug, y_aug
+
 def main():
     newX, newY = generate_unscaled_synthetic_data()
     newX_scaled = _scale_data(newX)
@@ -220,7 +260,7 @@ def main():
     # print()
     # print(newY)
 
-    logistic_regression.run_algorithm_custom_train(newX_scaled, newY)
+    # logistic_regression.run_algorithm_custom_train(newX_scaled, newY)
 
     ## TODO:
     # - convert to unscaled data generation (or give it as an option)
