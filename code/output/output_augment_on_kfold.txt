@@ -1,0 +1,315 @@
+MODEL CONFIGURATION
+Model: MLP
+Mode: K-FOLD
+Data Augmentation: ON
+
+
+-------K-FOLD (WITH AUGMENTATION)---------
+
+Fold 0
+
+Model comparison:
+
+Model                    Best Train Acc  Best Val Acc    Best Val Loss
+------------------------------------------------------------------------
+Baseline MLP             0.9475          0.9288          0.2120
+Dropout MLP              0.9332          0.9236          0.2095
+L1 MLP                   0.9484          0.9219          0.2198
+L2 MLP                   0.9449          0.9288          0.2047
+L1 + L2 MLP              0.9488          0.9253          0.2120
+Full Regularized MLP     0.9245          0.9271          0.2094
+
+Selected MLP model: L2 MLP | best val acc: 0.9288 | best val loss: 0.2047
+Training Acc: 0.9396
+Validation Acc: 0.9437
+
+Fold 1
+
+Model comparison:
+
+Model                    Best Train Acc  Best Val Acc    Best Val Loss
+------------------------------------------------------------------------
+Baseline MLP             0.9410          0.9288          0.2092
+Dropout MLP              0.9288          0.9271          0.2003
+L1 MLP                   0.9384          0.9271          0.2081
+L2 MLP                   0.9384          0.9288          0.2052
+L1 + L2 MLP              0.9388          0.9253          0.2140
+Full Regularized MLP     0.9258          0.9253          0.2089
+
+Selected MLP model: L2 MLP | best val acc: 0.9288 | best val loss: 0.2052
+Training Acc: 0.9347
+Validation Acc: 0.9375
+
+Fold 2
+
+Model comparison:
+
+Model                    Best Train Acc  Best Val Acc    Best Val Loss
+------------------------------------------------------------------------
+Baseline MLP             0.9466          0.9323          0.1803
+Dropout MLP              0.9340          0.9236          0.1928
+L1 MLP                   0.9470          0.9253          0.1824
+L2 MLP                   0.9475          0.9219          0.1840
+L1 + L2 MLP              0.9444          0.9306          0.1887
+Full Regularized MLP     0.9332          0.9306          0.1879
+
+Selected MLP model: Baseline MLP | best val acc: 0.9323 | best val loss: 0.1803
+Training Acc: 0.9396
+Validation Acc: 0.9500
+
+Fold 3
+
+Model comparison:
+
+Model                    Best Train Acc  Best Val Acc    Best Val Loss
+------------------------------------------------------------------------
+Baseline MLP             0.9470          0.9271          0.1906
+Dropout MLP              0.9310          0.9340          0.1853
+L1 MLP                   0.9466          0.9323          0.1899
+L2 MLP                   0.9457          0.9358          0.1871
+L1 + L2 MLP              0.9449          0.9271          0.1899
+Full Regularized MLP     0.9275          0.9306          0.1861
+
+Selected MLP model: L2 MLP | best val acc: 0.9358 | best val loss: 0.1871
+Training Acc: 0.9420
+Validation Acc: 0.9500
+
+Fold 4
+
+Model comparison:
+
+Model                    Best Train Acc  Best Val Acc    Best Val Loss
+------------------------------------------------------------------------
+Baseline MLP             0.9401          0.9253          0.2057
+Dropout MLP              0.9297          0.9323          0.1997
+L1 MLP                   0.9375          0.9236          0.2015
+L2 MLP                   0.9392          0.9323          0.2063
+L1 + L2 MLP              0.9405          0.9306          0.2055
+Full Regularized MLP     0.9249          0.9271          0.2067
+
+Selected MLP model: Dropout MLP | best val acc: 0.9323 | best val loss: 0.1997
+Training Acc: 0.9347
+Validation Acc: 0.9688
+
+Fold 5
+
+Model comparison:
+
+Model                    Best Train Acc  Best Val Acc    Best Val Loss
+------------------------------------------------------------------------
+Baseline MLP             0.9457          0.9184          0.2145
+Dropout MLP              0.9349          0.9219          0.2146
+L1 MLP                   0.9470          0.9253          0.2210
+L2 MLP                   0.9488          0.9184          0.2247
+L1 + L2 MLP              0.9492          0.9236          0.2166
+Full Regularized MLP     0.9301          0.9219          0.2272
+
+Selected MLP model: L1 MLP | best val acc: 0.9253 | best val loss: 0.2210
+Training Acc: 0.9403
+Validation Acc: 0.9500
+
+Fold 6
+
+Model comparison:
+
+Model                    Best Train Acc  Best Val Acc    Best Val Loss
+------------------------------------------------------------------------
+Baseline MLP             0.9397          0.9306          0.2039
+Dropout MLP              0.9340          0.9340          0.2010
+L1 MLP                   0.9414          0.9236          0.2103
+L2 MLP                   0.9410          0.9236          0.2020
+L1 + L2 MLP              0.9444          0.9271          0.2069
+Full Regularized MLP     0.9301          0.9288          0.2115
+
+Selected MLP model: Dropout MLP | best val acc: 0.9340 | best val loss: 0.2010
+Training Acc: 0.9358
+Validation Acc: 0.9375
+
+Fold 7
+
+Model comparison:
+
+Model                    Best Train Acc  Best Val Acc    Best Val Loss
+------------------------------------------------------------------------
+Baseline MLP             0.9492          0.9253          0.2046
+Dropout MLP              0.9371          0.9288          0.2056
+L1 MLP                   0.9505          0.9323          0.2050
+L2 MLP                   0.9466          0.9288          0.2050
+L1 + L2 MLP              0.9470          0.9219          0.2091
+Full Regularized MLP     0.9301          0.9184          0.2165
+
+Selected MLP model: L1 MLP | best val acc: 0.9323 | best val loss: 0.2050
+Training Acc: 0.9462
+Validation Acc: 0.9563
+
+Fold 8
+
+Model comparison:
+
+Model                    Best Train Acc  Best Val Acc    Best Val Loss
+------------------------------------------------------------------------
+Baseline MLP             0.9466          0.9358          0.2022
+Dropout MLP              0.9353          0.9340          0.2093
+L1 MLP                   0.9475          0.9392          0.2017
+L2 MLP                   0.9462          0.9410          0.1982
+L1 + L2 MLP              0.9466          0.9392          0.2071
+Full Regularized MLP     0.9253          0.9306          0.2088
+
+Selected MLP model: L2 MLP | best val acc: 0.9410 | best val loss: 0.1982
+Training Acc: 0.9434
+Validation Acc: 0.9812
+
+Fold 9
+
+Model comparison:
+
+Model                    Best Train Acc  Best Val Acc    Best Val Loss
+------------------------------------------------------------------------
+Baseline MLP             0.9436          0.9236          0.2009
+Dropout MLP              0.9327          0.9271          0.2064
+L1 MLP                   0.9440          0.9288          0.2021
+L2 MLP                   0.9462          0.9219          0.2062
+L1 + L2 MLP              0.9466          0.9253          0.2061
+Full Regularized MLP     0.9275          0.9184          0.2133
+
+Selected MLP model: L1 MLP | best val acc: 0.9288 | best val loss: 0.2021
+Training Acc: 0.9389
+Validation Acc: 0.9437
+
+FINAL AVERAGE ACCURACIES
+Training accuracy: 0.9395
+Validation accuracy: 0.9519
+
+MODEL CONFIGURATION
+Model: LOGISTIC
+Mode: K-FOLD
+Data Augmentation: ON
+
+
+-------K-FOLD (WITH AUGMENTATION)---------
+
+Fold 0
+	Converged at iteration 57
+	Reached max. iteration number
+	Reached max. iteration number
+Training Acc: 0.8677
+Validation Acc: 0.8625
+
+Fold 1
+	Converged at iteration 48
+	Reached max. iteration number
+	Reached max. iteration number
+Training Acc: 0.7705
+Validation Acc: 0.8187
+
+Fold 2
+	Converged at iteration 64
+	Reached max. iteration number
+	Reached max. iteration number
+Training Acc: 0.8031
+Validation Acc: 0.8063
+
+Fold 3
+	Converged at iteration 48
+	Reached max. iteration number
+	Reached max. iteration number
+Training Acc: 0.8708
+Validation Acc: 0.9187
+
+Fold 4
+	Converged at iteration 54
+	Reached max. iteration number
+	Reached max. iteration number
+Training Acc: 0.8014
+Validation Acc: 0.8125
+
+Fold 5
+	Converged at iteration 48
+	Reached max. iteration number
+	Converged at iteration 2386
+Training Acc: 0.7816
+Validation Acc: 0.7688
+
+Fold 6
+	Converged at iteration 57
+	Reached max. iteration number
+	Converged at iteration 2146
+Training Acc: 0.8684
+Validation Acc: 0.8875
+
+Fold 7
+	Converged at iteration 61
+	Converged at iteration 3098
+	Reached max. iteration number
+Training Acc: 0.8726
+Validation Acc: 0.8875
+
+Fold 8
+	Converged at iteration 54
+	Reached max. iteration number
+	Reached max. iteration number
+Training Acc: 0.7872
+Validation Acc: 0.8500
+
+Fold 9
+	Converged at iteration 51
+	Reached max. iteration number
+	Reached max. iteration number
+Training Acc: 0.8010
+Validation Acc: 0.8125
+
+FINAL AVERAGE ACCURACIES
+Training accuracy: 0.8224
+Validation accuracy: 0.8425
+
+MODEL CONFIGURATION
+Model: RANDOM_FOREST
+Mode: K-FOLD
+Data Augmentation: ON
+
+
+-------K-FOLD (WITH AUGMENTATION)---------
+
+Fold 0
+Training Acc: 0.9330
+Validation Acc: 0.9062
+
+Fold 1
+Training Acc: 0.9361
+Validation Acc: 0.9125
+
+Fold 2
+Training Acc: 0.9365
+Validation Acc: 0.9437
+
+Fold 3
+Training Acc: 0.9368
+Validation Acc: 0.9812
+
+Fold 4
+Training Acc: 0.9278
+Validation Acc: 0.9250
+
+Fold 5
+Training Acc: 0.9274
+Validation Acc: 0.9125
+
+Fold 6
+Training Acc: 0.9420
+Validation Acc: 0.9750
+
+Fold 7
+Training Acc: 0.9361
+Validation Acc: 0.9187
+
+Fold 8
+Training Acc: 0.9344
+Validation Acc: 0.9187
+
+Fold 9
+Training Acc: 0.9372
+Validation Acc: 0.9625
+
+FINAL AVERAGE ACCURACIES
+Training accuracy: 0.9347
+Validation accuracy: 0.9356

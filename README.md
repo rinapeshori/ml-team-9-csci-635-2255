@@ -6,7 +6,7 @@ Group project for Team 9, CSCI 635, Intro to Machine Learning, Spring 2026.
 
 ## Abstract
   
-In this project, we develop and fine-tune three models that classify a person's risk of burnout as low, medium, or high based on several factors. By correctly and applying principles of preprocessing and parameter fine-tuning, our models all achieved at least <average metric> on the test dataset, with our best model averaging <best metric>. Such models allow us to anticipate burnout before it happens, identify the most influential factors that may cause burnout, and recommend preemptive actions to reduce burnout risk.
+In this project, we develop and fine-tune three models that classify a person's risk of burnout as low, medium, or high based on several factors. By correctly and applying principles of preprocessing and parameter fine-tuning, our models all achieved at least 88% accuracy on the unaugmented test dataset, with our best model averaging 96.9% accuracy. Additionally, the three models averaged approximately 90% accuracy on the augmented dataset. High generalizability was noted, as no significant change in metrics was observed when using k-fold validation. Such models allow us to anticipate burnout before it happens, identify the most influential factors that may cause burnout, and recommend preemptive actions to reduce burnout risk.
 
 ## Execution instructions
 
