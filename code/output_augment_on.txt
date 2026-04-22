@@ -1,0 +1,123 @@
+MODEL CONFIGURATION
+Model: MLP
+Mode: TRAIN/TEST
+Data Augmentation: ON
+
+
+-------TRAIN/TEST (WITH AUGMENTATION)---------
+
+Model comparison:
+
+Model                    Best Train Acc  Best Val Acc    Best Val Loss
+------------------------------------------------------------------------
+Baseline MLP             0.9430          0.9234          0.1981
+Dropout MLP              0.9285          0.9297          0.2011
+L1 MLP                   0.9355          0.9187          0.2122
+L2 MLP                   0.9383          0.9219          0.2085
+L1 + L2 MLP              0.9437          0.9203          0.2085
+Full Regularized MLP     0.9203          0.9219          0.2095
+
+Selected MLP model: Dropout MLP | best val acc: 0.9297 | best val loss: 0.2011
+
+RESULTS
+Training accuracy: 0.9316
+Test accuracy: 0.9475
+
+Confusion Matrix:
+Predicted    0    1   2
+Actual
+0          198    6   0
+1            4  162   3
+2            0    8  19
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.98      0.97      0.98       204
+           1       0.92      0.96      0.94       169
+           2       0.86      0.70      0.78        27
+
+    accuracy                           0.95       400
+   macro avg       0.92      0.88      0.90       400
+weighted avg       0.95      0.95      0.95       400
+
+
+Per-Class Accuracy:
+Class 0 Accuracy: 0.9706
+Class 1 Accuracy: 0.9586
+Class 2 Accuracy: 0.7037
+
+MODEL CONFIGURATION
+Model: LOGISTIC
+Mode: TRAIN/TEST
+Data Augmentation: ON
+
+
+-------TRAIN/TEST (WITH AUGMENTATION)---------
+	Converged at iteration 57
+	Reached max. iteration number
+	Reached max. iteration number
+
+RESULTS
+Training accuracy: 0.8366
+Test accuracy: 0.8650
+
+Confusion Matrix:
+Predicted    0    1  2
+Actual
+0          199    5  0
+1           23  146  0
+2            0   26  1
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.90      0.98      0.93       204
+           1       0.82      0.86      0.84       169
+           2       1.00      0.04      0.07        27
+
+    accuracy                           0.86       400
+   macro avg       0.91      0.63      0.62       400
+weighted avg       0.87      0.86      0.84       400
+
+
+Per-Class Accuracy:
+Class 0 Accuracy: 0.9755
+Class 1 Accuracy: 0.8639
+Class 2 Accuracy: 0.0370
+
+MODEL CONFIGURATION
+Model: RANDOM_FOREST
+Mode: TRAIN/TEST
+Data Augmentation: ON
+
+
+-------TRAIN/TEST (WITH AUGMENTATION)---------
+
+RESULTS
+Training accuracy: 0.9331
+Test accuracy: 0.9625
+
+Confusion Matrix:
+Predicted    0    1   2
+Actual
+0          200    4   0
+1            6  160   3
+2            0    2  25
+
+Classification Report:
+              precision    recall  f1-score   support
+
+           0       0.97      0.98      0.98       204
+           1       0.96      0.95      0.96       169
+           2       0.89      0.93      0.91        27
+
+    accuracy                           0.96       400
+   macro avg       0.94      0.95      0.95       400
+weighted avg       0.96      0.96      0.96       400
+
+
+Per-Class Accuracy:
+Class 0 Accuracy: 0.9804
+Class 1 Accuracy: 0.9467
+Class 2 Accuracy: 0.9259
