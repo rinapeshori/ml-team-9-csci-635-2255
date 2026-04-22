@@ -18,6 +18,11 @@ import argparse
 import importlib
 import numpy as np
 import pandas as pd
+
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.metrics import confusion_matrix
+
 from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import classification_report
 from analysis.data_splits import train_test, kfold_crossval
@@ -46,13 +51,6 @@ def run_kfold(use_augmentation: bool, model, X_train, y_train):
     if isinstance(y_train, pd.DataFrame):
         y_train = y_train.squeeze()
 
-    if not use_augmentation:
-        print("\n-------K-FOLD (NO AUGMENTATION)---------")
-        tacc, vacc = kfold_crossval(X_train, y_train, model.train)
-        print(f"Training accuracy: {tacc:.4f}")
-        print(f"Validation accuracy: {vacc:.4f}")
-        return
-
     n = X_train.shape[0]
     k = 10
     rng = np.random.RandomState(42)
@@ -62,7 +60,10 @@ def run_kfold(use_augmentation: bool, model, X_train, y_train):
     t_acc = 0.0
     v_acc = 0.0
 
-    print("\n-------K-FOLD (WITH AUGMENTATION)---------")
+    if use_augmentation:
+        print("\n-------K-FOLD (WITH AUGMENTATION)---------")
+    else:
+        print("\n-------K-FOLD (NO AUGMENTATION)---------")
 
     for i in range(k):
         print(f"\nFold {i}")
@@ -73,28 +74,45 @@ def run_kfold(use_augmentation: bool, model, X_train, y_train):
         X_fold_train = X_train.drop(X_train.index[indices[i]])
         y_fold_train = y_train.drop(y_train.index[indices[i]])
 
-        if USE_UNSCALED:
-            # UNCALED AUGMENTATION
-            X_train_aug_raw, y_train_aug = augment_training_data_unscaled(
-                X_fold_train,
-                y_fold_train,
-                n_samples=len(X_fold_train)
-            )
+        if use_augmentation:
+            if USE_UNSCALED:
+                # UNCALED AUGMENTATION
+                X_train_aug_raw, y_train_final = augment_training_data_unscaled(
+                    X_fold_train,
+                    y_fold_train,
+                    n_samples=len(X_fold_train)
+                )
 
-            scaler = StandardScaler()
-            X_train_aug = pd.DataFrame(
-                scaler.fit_transform(X_train_aug_raw),
-                columns=X_train.columns
-            )
-            X_val_scaled = pd.DataFrame(
-                scaler.transform(X_val),
-                columns=X_train.columns
-            )
+                scaler = StandardScaler()
+                X_train_final = pd.DataFrame(
+                    scaler.fit_transform(X_train_aug_raw),
+                    columns=X_train.columns
+                )
+                X_val_scaled = pd.DataFrame(
+                    scaler.transform(X_val),
+                    columns=X_train.columns
+                )
 
+            else:
+                # SCALED AUGMENTATION
+                scaler = StandardScaler()
+                X_fold_train_scaled = pd.DataFrame(
+                    scaler.fit_transform(X_fold_train),
+                    columns=X_train.columns
+                )
+                X_val_scaled = pd.DataFrame(
+                    scaler.transform(X_val),
+                    columns=X_train.columns
+                )
+
+                X_train_final, y_train_final = augment_training_data(
+                    X_fold_train_scaled,
+                    y_fold_train,
+                    n_samples=len(X_fold_train_scaled)
+                )
         else:
-            # SCALED AUGMENTATION
             scaler = StandardScaler()
-            X_fold_train_scaled = pd.DataFrame(
+            X_train_final = pd.DataFrame(
                 scaler.fit_transform(X_fold_train),
                 columns=X_train.columns
             )
@@ -102,19 +120,14 @@ def run_kfold(use_augmentation: bool, model, X_train, y_train):
                 scaler.transform(X_val),
                 columns=X_train.columns
             )
+            y_train_final = y_fold_train
 
-            X_train_aug, y_train_aug = augment_training_data(
-                X_fold_train_scaled,
-                y_fold_train,
-                n_samples=len(X_fold_train_scaled)
-            )
+        fitfunc = model.train(X_train_final, y_train_final)
 
-        fitfunc = model.train(X_train_aug, y_train_aug)
-
-        y_train_pred = fitfunc(X_train_aug)
+        y_train_pred = fitfunc(X_train_final)
         y_val_pred = fitfunc(X_val_scaled)
 
-        fold_train_acc = np.mean(y_train_pred == y_train_aug.to_numpy())
+        fold_train_acc = np.mean(y_train_pred == y_train_final.to_numpy())
         fold_val_acc = np.mean(y_val_pred == y_val.to_numpy())
 
         print(f"Training Acc: {fold_train_acc:.4f}")
@@ -128,7 +141,7 @@ def run_kfold(use_augmentation: bool, model, X_train, y_train):
     print(f"Validation accuracy: {v_acc / k:.4f}")
 
 
-def run_train_test(use_augmentation: bool, model, X_train, X_test, y_train, y_test):
+def run_train_test(use_augmentation: bool, model, model_name, X_train, X_test, y_train, y_test):
     if isinstance(y_train, pd.DataFrame):
         y_train = y_train.squeeze()
     if isinstance(y_test, pd.DataFrame):
@@ -206,8 +219,28 @@ def run_train_test(use_augmentation: bool, model, X_train, X_test, y_train, y_te
     print("\nConfusion Matrix:")
     print(cm)
 
+    cm_array = confusion_matrix(y_test, y_test_pred)
+
+    plt.figure(figsize=(6, 5))
+    sns.heatmap(cm_array, annot=True, fmt="d", cmap="Blues",
+                xticklabels=["Low", "Medium", "High"],
+                yticklabels=["Low", "Medium", "High"])
+    plt.xlabel("Predicted")
+    plt.ylabel("Actual")
+    plt.title("Confusion Matrix Heatmap")
+    plt.savefig(f"cm_{model_name}.png")
+    plt.show()
+    plt.close()
+
     print("\nClassification Report:")
     print(classification_report(y_test, y_test_pred, zero_division=0))
+
+    print("\nPer-Class Accuracy:")
+    y_test_np = y_test.to_numpy()
+    for cls in np.unique(y_test_np):
+        mask = (y_test_np == cls)
+        cls_acc = np.mean(y_test_pred[mask] == y_test_np[mask])
+        print(f"Class {cls} Accuracy: {cls_acc:.4f}")
 
 
 def main(args):
@@ -231,7 +264,7 @@ def main(args):
         if args.kfold:
             run_kfold(args.augment, model, X_train, y_train)
         else:
-            run_train_test(args.augment, model, X_train, X_test, y_train, y_test)
+            run_train_test(args.augment, model, name, X_train, X_test, y_train, y_test)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
