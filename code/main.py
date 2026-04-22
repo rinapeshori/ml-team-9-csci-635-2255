@@ -45,6 +45,8 @@ def print_config(kfold: bool, augment: bool, model_name: str):
     print(f"Model: {model_name.upper()}")
     print(f"Mode: {'K-FOLD' if kfold else 'TRAIN/TEST'}")
     print(f"Data Augmentation: {'ON' if augment else 'OFF'}")
+    if augment:
+        print(f"Data Augmentation Type: {'UNSCALED' if USE_UNSCALED else 'SCALED'}")
     print()
 
 def run_kfold(use_augmentation: bool, model, X_train, y_train):
@@ -151,7 +153,7 @@ def run_train_test(use_augmentation: bool, model, model_name, X_train, X_test, y
         print("\n-------TRAIN/TEST (WITH AUGMENTATION)---------")
 
         if USE_UNSCALED:
-            # UNCALED AUGMENTATION
+            # UNSCALED AUGMENTATION
             X_train_aug_raw, y_train_final = augment_training_data_unscaled(
                 X_train,
                 y_train,
