@@ -11,8 +11,15 @@ In this project, we develop and fine-tune three models that classify a person's 
 ## Execution instructions
 
 Before running any code, ensure you have python downloaded on your machine. In the root directory of the project, start by installing all of the dependencies in the requirements:
-`pip install -r code/requirements.txt`
+`pip install -r requirements.txt`
 
-To run the 3-model pipeline, simply run `python main.py` in the root directory. This will run all 3 models on a train-test split and output the accuracy and confusion matrix results.
+To run the pipeline, run `python code/main.py` with one of the model flags in the root directory. The code will not run if no flag is specified. The model flags are as follows:
+- `--mlp`: multi-level perceptron
+- `--logistic`: logistic regression
+- `--random_forest`: random forest
+- `--all`: run all models
+This will create a train/test split, train the specified model(s) and output the resulting confusion matrices and metrics.
 
-Alternatively, `python main.py --kfold` will run k-fold cross-validation (number of folds is set to 10) on each model and output the training and validation accuracies.
+Additional flags can be added to use other training methodologies:
+- `--k-fold`: instead of just a train/test split, validate the chosen model(s) with 10-fold cross-validation. This will take a while for the random forest.
+- `--augment`: Use the stratified augmented data instead of the original dataset.
